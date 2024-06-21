@@ -22,7 +22,7 @@ we adding the features of page break in the froala<br> with some added features 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/one-on-one-tutoring.git
+   git clone https://github.com/DivyDeshmukh/Zackathon-Pagination-Feature-Team.git
    ```
 2. Install dependencies:
    ```bash
