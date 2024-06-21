@@ -101,7 +101,6 @@
           .insertBefore(navigation, document.getElementById("example"));
 
         const updatePageNumbers = () => {
-          console.log(currentPageNum);
           navigation.innerHTML = `<button class="btn" id="prev">prev</button><p>Total Pages: ${counter} || Current Page: ${
             currentPageNum + 1
           }</p><button class="btn" id="next">next</button>`;
@@ -112,14 +111,14 @@
           '<button class="btn" id="prev">prev</button><p>Total Page: 1 || Current Page: 0</p><button class="btn" id="next">next</button>';
 
         function attachEventListeners() {
-          console.log(counter, currentPageNum);
+          
           document.getElementById("prev").addEventListener("click", () => {
             if (currentPageNum > 0) {
               currentPageNum--;
               updatePageNumbers();
               scrollToPage(currentPageNum);
             }
-            console.log("CurrentPageNum: ", currentPageNum);
+            
           });
 
           document.getElementById("next").addEventListener("click", () => {
@@ -128,17 +127,12 @@
               updatePageNumbers();
               scrollToPage(currentPageNum);
             }
-            console.log(
-              "CurrentPageNum: ",
-              currentPageNum,
-              "Counter: ",
-              counter
-            );
+           
           });
         }
 
         function scrollToPage(pageNum) {
-          console.log(hrElements);
+          
           if (pageNum === 0) {
             editorElement.scrollIntoView({
               behavior: "smooth",
