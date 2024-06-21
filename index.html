@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <link
+      href="node_modules/froala-editor/css/froala_editor.pkgd.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/froala-editor@latest/css/plugins/image.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.css"
+    />
+    
+    <style>
+      .break {
+        page-break-after: always;
+        border-top: 2px solid #fff;
+        margin: 20px 0;
+        color: #fff;
+        background-color: #fff;
+      }
+      .page {
+        height: 1122px; /* Approximate height of an A4 page at 96 DPI */
+        overflow: hidden;
+        position: relative;
+      }
+      .btn {
+        background-color: #4caf50;
+        color: white;
+        margin: 10px;
+        padding: 15px 32px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .navigation {
+        height: 60px;
+        width: 100%;
+        padding: 10px;
+        background-color: aqua;
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        position: fixed;
+        bottom: 0px;
+        z-index: 999;
+        font-weight: 900;
+        font-family: Cursive;
+        color: black;
+        font-size: 25px;
+      }
+    </style>
+  </head>
+  <body style="position: relative; padding: 15px 0">
+    <div id="example"></div>
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/mode/xml/xml.min.js"
+    ></script>
+
+    <!-- Include PDF export JS lib. -->
+    <script
+      type="text/javascript"
+      src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/plugins/image.min.js"></script>
+    <script
+      type="text/javascript"
+      src="node_modules/froala-editor/js/froala_editor.pkgd.min.js"
+    ></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const editorElement = document.getElementById("example");
+        editorElement.style.height = "100%";
+        let currentPageNum = 0;
+        const A4_PAGE_HEIGHT = 1122; // Approximate height of an A4 page at 96 DPI
+        let counter = 1;
+        let hrElements;
+
+        const navigation = document.createElement("header");
+        navigation.classList.add("navigation");
+        document
+          .querySelector("body")
+          .insertBefore(navigation, document.getElementById("example"));
+
+        const updatePageNumbers = () => {
+          console.log(currentPageNum);
+          navigation.innerHTML = `<button class="btn" id="prev">prev</button><p>Total Pages: ${counter} || Current Page: ${
+            currentPageNum + 1
+          }</p><button class="btn" id="next">next</button>`;
+          attachEventListeners();
+        };
+
+        navigation.innerHTML =
+          '<button class="btn" id="prev">prev</button><p>Total Page: 1 || Current Page: 0</p><button class="btn" id="next">next</button>';
+
+        function attachEventListeners() {
+          console.log(counter, currentPageNum);
+          document.getElementById("prev").addEventListener("click", () => {
+            if (currentPageNum > 0) {
+              currentPageNum--;
+              updatePageNumbers();
+              scrollToPage(currentPageNum);
+            }
+            console.log("CurrentPageNum: ", currentPageNum);
+          });
+
+          document.getElementById("next").addEventListener("click", () => {
+            if (currentPageNum < counter - 1) {
+              currentPageNum++;
+              updatePageNumbers();
+              scrollToPage(currentPageNum);
+            }
+            console.log(
+              "CurrentPageNum: ",
+              currentPageNum,
+              "Counter: ",
+              counter
+            );
+          });
+        }
+
+        function scrollToPage(pageNum) {
+          console.log(hrElements);
+          if (pageNum === 0) {
+            editorElement.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          } else {
+            const hrElement = hrElements[pageNum - 1];
+            if (hrElement) {
+              hrElement.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
+        }
+
+        // Initialize Froala Editor
+        const editorInstance = new FroalaEditor("#example", {
+          documentReady: true,
+          events: {
+            contentChanged: function () {
+              checkForPageBreak();
+            },
+          },
+          toolbarButtons: {
+            moreText: {
+              buttons: [
+                "bold",
+                "italic",
+                "underline",
+                "strikeThrough",
+                "subscript",
+                "superscript",
+                "fontFamily",
+                "fontSize",
+                "textColor",
+                "backgroundColor",
+                "inlineClass",
+                "inlineStyle",
+                "clearFormatting",
+              ],
+            },
+            moreParagraph: {
+              buttons: [
+                "alignLeft",
+                "alignCenter",
+                "formatOLSimple",
+                "alignRight",
+                "alignJustify",
+                "formatOL",
+                "formatUL",
+                "paragraphFormat",
+                "paragraphStyle",
+                "lineHeight",
+                "outdent",
+                "indent",
+                "quote",
+              ],
+            },
+            moreRich: {
+              buttons: [
+                "insertLink",
+                "insertImage",
+                "insertVideo",
+                "insertTable",
+                "emoticons",
+                "fontAwesome",
+                "specialCharacters",
+                "embedly",
+                "insertFile",
+                "insertHR",
+              ],
+            },
+            moreMisc: {
+              buttons: [
+                "undo",
+                "redo",
+                "fullscreen",
+                "print",
+                "getPDF",
+                "spellChecker",
+                "selectAll",
+                "html",
+                "help",
+              ],
+              align: "right",
+              buttonsVisible: 2,
+            },
+          },
+        });
+
+        if ("ResizeObserver" in window) {
+          const resizeObserver = new ResizeObserver(() => {
+            checkForPageBreak();
+          });
+          resizeObserver.observe(editorElement);
+        } else {
+          console.warn("ResizeObserver is not supported in your browser.");
+        }
+
+        function checkForPageBreak() {
+          const editorContent = editorElement.querySelector(".fr-view");
+          if (!editorContent) return;
+
+          // Reset hrElements and counter
+          const existingHrs = editorContent.querySelectorAll("hr.break");
+          existingHrs.forEach((hr) => hr.remove());
+          hrElements = [];
+          counter = 1;
+          currentPageNum = 0;
+          updatePageNumbers();
+
+          // Iterate through content and insert page breaks
+          let currentHeight = 0;
+          const elements = Array.from(editorContent.children);
+
+          elements.forEach((el, index) => {
+            const elHeight = el.offsetHeight;
+            currentHeight += elHeight;
+
+            if (currentHeight > A4_PAGE_HEIGHT) {
+              insertPageBreak(editorContent, elements[index]);
+              currentHeight = elHeight; // Reset currentHeight to current element height
+            }
+          });
+
+          hrElements = document.querySelectorAll("hr.break");
+        }
+
+        function insertPageBreak(contentElement, element) {
+          const newLine = document.createElement("hr");
+          newLine.className = "break";
+          contentElement.insertBefore(newLine, element);
+          counter++;
+          updatePageNumbers();
+        }
+
+        checkForPageBreak(); // Initial check for existing content
+      });
+    </script>
+  </body>
+</html>
