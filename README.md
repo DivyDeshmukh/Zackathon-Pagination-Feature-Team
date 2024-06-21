@@ -28,9 +28,11 @@ we adding the features of page break in the froala<br> with some added features 
    ```bash
    go to project directory
    npm install
+   npm i froala-editor
    ```
 3. Install dependencies:
    ```bash
+   
    now run the file with live server
    ```
 
